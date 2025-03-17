@@ -2,11 +2,14 @@
 
 out vec4 FragColor;
 
+uniform vec2 position;
+uniform vec2 screen_center;
+uniform int iterations;
+uniform float treshold;
+uniform float zoom;
+
 const vec4 black = vec4(0.0, 0.0, 0.0, 1.0);
 const vec4 blue = vec4(0.2, 0.1, 0.9, 1.0);
-const vec2 center = vec2(400, 300);
-const float treshold = 2.5;
-const int iterations = 50;
 
 vec2 f(vec2 z, vec2 c) {
     float a = z.x;
@@ -28,6 +31,7 @@ vec4 calc_stability_color(vec2 c) {
 }
 
 void main() {
-    vec2 coord = (gl_FragCoord.xy - center) / 200;
+    vec2 coord = (gl_FragCoord.xy - screen_center - position) * zoom / 200;
+
     FragColor = calc_stability_color(coord);
 }

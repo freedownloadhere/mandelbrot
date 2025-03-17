@@ -15,8 +15,9 @@ GLFWwindow* window;
 GLuint program, vao, vbo, ebo;
 GLuint zoom_uni, treshold_uni, iterations_uni;
 
-float zoom = 200.0;
-float treshold = 2.5;
+float zoom = 2.0f;
+float treshold = 2.5f;
+float pos_x = 0.0f, pos_y = 0.0f;
 int iterations = 50;
 
 const float vertices[12] = {
@@ -47,6 +48,32 @@ char* readFile(const char* filePath) {
     return buf;
 }
 
+void scroll_cb(GLFWwindow* wnd, double xoff, double yoff) {
+    zoom += (float)yoff * 0.1f;
+    if(zoom < 0.01f)
+	zoom = 0.01f;
+}
+
+void key_cb(GLFWwindow* wnd, int key, int scancode, int action, int mods) {
+    if(action == GLFW_RELEASE)
+	return;
+
+    if(key == GLFW_KEY_W)
+	pos_y -= zoom;
+    if(key == GLFW_KEY_S)
+	pos_y += zoom;
+    if(key == GLFW_KEY_A)
+	pos_x += zoom;
+    if(key == GLFW_KEY_D)
+	pos_x -= zoom;
+}
+
+void window_size_cb(GLFWwindow* wnd, int w, int h) {
+    glViewport(0, 0, w, h);
+    window_width = w;
+    window_height = h;
+}
+
 void create_window() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -63,6 +90,10 @@ void create_window() {
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     gladLoadGL();
     glViewport(0, 0, window_width, window_height);
+
+    glfwSetWindowSizeCallback(window, window_size_cb);
+    glfwSetScrollCallback(window, scroll_cb);
+    glfwSetKeyCallback(window, key_cb);
 }
 
 void create_shader_program() {
@@ -103,17 +134,7 @@ void create_shader_program() {
     free((void*)vert_source);
     free((void*)frag_source);
 
-    glGetUniformLocation(program, "treshold");
-    glGetUniformLocation(program, "iterations");
-}
-
-void scroll_cb() {
-    GLuint zoom_uni = glGetUniformLocation(program, "zoom");
-
-}
-
-void key_cb() {
-
+    glUseProgram(program);
 }
 
 void create_buffers() {
@@ -141,14 +162,25 @@ void do_rendering() {
     glBindVertexArray(vao);
 
     while(!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+	glfwPollEvents();
 
-        glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+	GLuint pos_uni = glGetUniformLocation(program, "position");
+	GLuint screen_center_uni = glGetUniformLocation(program, "screen_center");
+	GLuint iterations_uni = glGetUniformLocation(program, "iterations");
+	GLuint treshold_uni = glGetUniformLocation(program, "treshold");
+	GLuint zoom_uni = glGetUniformLocation(program, "zoom");
 
+	glUniform2f(pos_uni, pos_x, pos_y);
+	glUniform2f(screen_center_uni, window_width * 0.5f, window_height * 0.5f);
+	glUniform1i(iterations_uni, iterations);
+	glUniform1f(treshold_uni, treshold);
+	glUniform1f(zoom_uni, zoom);
+
+	glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        glfwSwapBuffers(window);
+	glfwSwapBuffers(window);
     }
 
     glfwTerminate();
