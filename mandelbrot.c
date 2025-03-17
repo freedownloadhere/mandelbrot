@@ -5,12 +5,19 @@
 
 #include "include/glad/glad.h"
 #include "include/GLFW/glfw3.h"
+//#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+//#include "include/cimgui/cimgui.h"
 
 int window_width = 800;
 int window_height = 600;
 const char* window_title = "mandelbrot";
 GLFWwindow* window;
 GLuint program, vao, vbo, ebo;
+GLuint zoom_uni, treshold_uni, iterations_uni;
+
+float zoom = 200.0;
+float treshold = 2.5;
+int iterations = 50;
 
 const float vertices[12] = {
     -1.0f, -1.0f, 0.0f,
@@ -42,8 +49,9 @@ char* readFile(const char* filePath) {
 
 void create_window() {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     window = glfwCreateWindow(
 	window_width,
@@ -61,8 +69,8 @@ void create_shader_program() {
     int status = 0;
     char info_log[1025] = { };
     GLuint vert_shader, frag_shader;
-    const char* vert_path = "./shader.vert.glsl";
-    const char* frag_path = "./shader.frag.glsl";
+    const char* vert_path = "./vert.glsl";
+    const char* frag_path = "./frag.glsl";
     const char* vert_source = readFile(vert_path);
     const char* frag_source = readFile(frag_path);
     vert_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -94,6 +102,18 @@ void create_shader_program() {
     glDeleteShader(frag_shader);
     free((void*)vert_source);
     free((void*)frag_source);
+
+    glGetUniformLocation(program, "treshold");
+    glGetUniformLocation(program, "iterations");
+}
+
+void scroll_cb() {
+    GLuint zoom_uni = glGetUniformLocation(program, "zoom");
+
+}
+
+void key_cb() {
+
 }
 
 void create_buffers() {
