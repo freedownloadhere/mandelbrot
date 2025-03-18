@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,14 +59,16 @@ void key_cb(GLFWwindow* wnd, int key, int scancode, int action, int mods) {
     if(action == GLFW_RELEASE)
 	return;
 
+    float vel = pow(2.0, -(zoom - 5.0));
+
     if(key == GLFW_KEY_W)
-	pos_y -= zoom;
+	pos_y -= vel;
     if(key == GLFW_KEY_S)
-	pos_y += zoom;
+	pos_y += vel;
     if(key == GLFW_KEY_A)
-	pos_x += zoom;
+	pos_x += vel;
     if(key == GLFW_KEY_D)
-	pos_x -= zoom;
+	pos_x -= vel;
 }
 
 void window_size_cb(GLFWwindow* wnd, int w, int h) {
@@ -174,7 +177,7 @@ void do_rendering() {
 	glUniform2f(screen_center_uni, window_width * 0.5f, window_height * 0.5f);
 	glUniform1i(iterations_uni, iterations);
 	glUniform1f(treshold_uni, treshold);
-	glUniform1f(zoom_uni, zoom);
+	glUniform1f(zoom_uni, pow(2.0, zoom));
 
 	glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);

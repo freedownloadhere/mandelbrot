@@ -31,7 +31,7 @@ vec4 calc_stability_color(vec2 c) {
 }
 
 void main() {
-    vec2 coord = (gl_FragCoord.xy - screen_center - position) * zoom / 200;
+    vec2 coord = (gl_FragCoord.xy - screen_center) / zoom - position;
 
     FragColor = calc_stability_color(coord);
 }
