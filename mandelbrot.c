@@ -16,7 +16,7 @@ GLFWwindow* window;
 GLuint program, vao, vbo, ebo;
 GLuint zoom_uni, treshold_uni, iterations_uni;
 
-float zoom = 2.0f;
+float zoom = 7.0f;
 float treshold = 2.5f;
 float pos_x = 0.0f, pos_y = 0.0f;
 int iterations = 50;

@@ -9,7 +9,7 @@ uniform float treshold;
 uniform float zoom;
 
 const vec4 black = vec4(0.0, 0.0, 0.0, 1.0);
-const vec4 blue = vec4(0.2, 0.1, 0.9, 1.0);
+const vec4 blue = vec4(0.2, 0.1, 0.7, 1.0);
 
 vec2 f(vec2 z, vec2 c) {
     float a = z.x;
@@ -18,16 +18,23 @@ vec2 f(vec2 z, vec2 c) {
 }
 
 vec4 calc_stability_color(vec2 c) {
+    int i = 1;
     vec2 z = vec2(0.0, 0.0);
-    for (int i = 1; i <= iterations; i++)
+
+    while (i <= iterations) {
         z = f(z, c);
+        if (distance(c, z) > treshold)
+            break;
+        i++;
+    }
 
-    float dist = distance(c, z);
-
-    if (dist <= treshold)
+    if (i >= iterations)
         return black;
-    else
-        return blue;
+
+    float a = float(i) / iterations;
+    vec4 col = 2.0 * a * blue;
+
+    return col;
 }
 
 void main() {
